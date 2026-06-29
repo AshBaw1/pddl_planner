@@ -1,0 +1,151 @@
+
+(define (domain conference-htn)
+
+  (:requirements :strips :typing :hierarchy)
+
+  (:types
+    conference
+  )
+
+  (:predicates
+    (budget-approved ?c - conference)
+    (venue-found ?c - conference)
+    (venue-reserved ?c - conference)
+    (speakers-invited ?c - conference)
+    (website-created ?c - conference)
+    (payments-enabled ?c - conference)
+    (announcement-published ?c - conference)
+    (registration-open ?c - conference)
+    (conference-organized ?c - conference)
+  )
+
+  ;; Primitive actions
+
+  (:action find-venue
+    :parameters (?c - conference)
+    :precondition (budget-approved ?c)
+    :effect (venue-found ?c)
+  )
+
+  (:action reserve-venue
+    :parameters (?c - conference)
+    :precondition (venue-found ?c)
+    :effect (venue-reserved ?c)
+  )
+
+  (:action invite-speakers
+    :parameters (?c - conference)
+    :precondition (venue-reserved ?c)
+    :effect (speakers-invited ?c)
+  )
+
+  (:action create-website
+    :parameters (?c - conference)
+    :precondition (venue-reserved ?c)
+    :effect (website-created ?c)
+  )
+
+  (:action enable-payments
+    :parameters (?c - conference)
+    :precondition (website-created ?c)
+    :effect (payments-enabled ?c)
+  )
+
+  (:action publish-announcement
+    :parameters (?c - conference)
+    :precondition (and
+      (speakers-invited ?c)
+      (payments-enabled ?c)
+    )
+    :effect (announcement-published ?c)
+  )
+
+  (:action mark-registration-open
+    :parameters (?c - conference)
+    :precondition (announcement-published ?c)
+    :effect (registration-open ?c)
+  )
+
+  (:action finish-conference-organization
+    :parameters (?c - conference)
+    :precondition (and
+      (venue-reserved ?c)
+      (speakers-invited ?c)
+      (registration-open ?c)
+    )
+    :effect (conference-organized ?c)
+  )
+
+  ;; Compound tasks
+
+  (:task organize-conference
+    :parameters (?c - conference)
+  )
+
+  (:task prepare-venue
+    :parameters (?c - conference)
+  )
+
+  (:task prepare-speakers
+    :parameters (?c - conference)
+  )
+
+  (:task open-registration
+    :parameters (?c - conference)
+  )
+
+  ;; HTN methods
+
+  (:method method-organize-conference
+    :parameters (?c - conference)
+    :task (organize-conference ?c)
+    :subtasks (and
+      (t1 (prepare-venue ?c))
+      (t2 (prepare-speakers ?c))
+      (t3 (open-registration ?c))
+      (t4 (finish-conference-organization ?c))
+    )
+    :ordering (and
+      (t1 < t2)
+      (t2 < t3)
+      (t3 < t4)
+    )
+  )
+
+  (:method method-prepare-venue
+    :parameters (?c - conference)
+    :task (prepare-venue ?c)
+    :subtasks (and
+      (t1 (find-venue ?c))
+      (t2 (reserve-venue ?c))
+    )
+    :ordering (and
+      (t1 < t2)
+    )
+  )
+
+  (:method method-prepare-speakers
+    :parameters (?c - conference)
+    :task (prepare-speakers ?c)
+    :subtasks (and
+      (t1 (invite-speakers ?c))
+    )
+  )
+
+  (:method method-open-registration
+    :parameters (?c - conference)
+    :task (open-registration ?c)
+    :subtasks (and
+      (t1 (create-website ?c))
+      (t2 (enable-payments ?c))
+      (t3 (publish-announcement ?c))
+      (t4 (mark-registration-open ?c))
+    )
+    :ordering (and
+      (t1 < t2)
+      (t2 < t3)
+      (t3 < t4)
+    )
+  )
+)
+

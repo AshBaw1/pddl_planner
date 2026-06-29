@@ -1,0 +1,22 @@
+
+(define (problem organize-ai-conference)
+  (:domain conference-htn)
+
+  (:objects
+    ai-conf - conference
+  )
+
+  (:init
+    (budget-approved ai-conf)
+  )
+
+  (:htn
+    :tasks (and
+      (t1 (organize-conference ai-conf))
+    )
+  )
+
+  (:goal
+    (conference-organized ai-conf)
+  )
+)
