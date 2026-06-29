@@ -29,6 +29,7 @@ python3 main.py examples/temporal/domain.pddl examples/temporal/problem.pddl --a
 
 ## Documentation: 
 
+```text
 educational_planner/
 │
 ├── main.py
@@ -69,7 +70,7 @@ educational_planner/
     │   Durative actions such as load, drive, unload.
     └── htn/
         HDDL-style hierarchical planning with tasks, methods, and subtasks.
-
+```
 
 Algorithms implemented:
 
